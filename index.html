@@ -1,11 +1,982 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>UPSC Quiz Generator</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPSC Quiz Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a56db;
+            --secondary: #1e3a8a;
+            --light: #f3f4f6;
+            --dark: #1f2937;
+            --success: #047857;
+            --warning: #f59e0b;
+            --danger: #dc2626;
+            --card-bg: #ffffff;
+            --text-primary: #1f2937;
+            --text-secondary: #4b5563;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 1.5rem 0;
+            text-align: center;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .content-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+        
+        .content-card h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            font-weight: 600;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+        }
+        
+        .topics-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+        }
+        
+        .subject-category {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .subject-category:last-child {
+            border-bottom: none;
+        }
+        
+        .subject-category h3 {
+            margin-bottom: 15px;
+            color: var(--secondary);
+            font-size: 1.3rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        
+        .subject-category h3 i {
+            margin-right: 10px;
+            color: var(--primary);
+        }
+        
+        .topics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 15px;
+        }
+        
+        .topic-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+        }
+        
+        .topic-item input[type="checkbox"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border: 2px solid #cbd5e1;
+            border-radius: 5px;
+            margin-right: 12px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .topic-item input[type="checkbox"]:checked {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .topic-item input[type="checkbox"]:checked::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+        }
+        
+        .topic-item label {
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: color 0.2s ease;
+        }
+        
+        .topic-item:hover label {
+            color: var(--primary);
+        }
+        
+        .topic-item:hover input[type="checkbox"] {
+            border-color: var(--primary);
+        }
+        
+        .question-options {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        
+        .question-option {
+            flex: 1;
+            text-align: center;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            background: white;
+        }
+        
+        .question-option.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 16px 35px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: block;
+            width: 100%;
+            margin-top: 20px;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.3);
+        }
+        
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 25px;
+            color: #6b7280;
+            font-size: 0.95rem;
+            margin-top: 20px;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .info-banner {
+            background: #dbeafe;
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+            display: none;
+        }
+        
+        .info-banner.show {
+            display: block;
+        }
+        
+        /* Quiz Screen Styles */
+        .quiz-screen {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .quiz-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .quiz-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        .timer {
+            background: var(--danger);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.2rem;
+            min-width: 100px;
+            text-align: center;
+        }
+        
+        .quiz-content {
+            display: flex;
+            gap: 30px;
+            flex: 1;
+        }
+        
+        .questions-section {
+            flex: 1;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .question-card {
+            background: #f9fafb;
+            border-left: 4px solid var(--primary);
+            padding: 25px;
+            border-radius: 0 10px 10px 0;
+            margin-bottom: 30px;
+        }
+        
+        .question-card h3 {
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            line-height: 1.5;
+        }
+        
+        .options {
+            list-style: none;
+        }
+        
+        .option {
+            padding: 15px;
+            margin-bottom: 12px;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+        }
+        
+        .option:hover {
+            border-color: var(--primary);
+        }
+        
+        .option.selected {
+            border-color: var(--primary);
+            background: #dbeafe;
+        }
+        
+        .question-tracker {
+            width: 280px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+        }
+        
+        .question-tracker h3 {
+            margin-bottom: 20px;
+            color: var(--primary);
+            font-size: 1.4rem;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        .question-dots {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+        
+        .question-dot {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 500;
+            cursor: pointer;
+            background: #e5e7eb;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+        
+        .question-dot.current {
+            background: var(--warning);
+            color: white;
+            transform: scale(1.1);
+            box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.3);
+        }
+        
+        .question-dot.answered {
+            background: var(--success);
+            color: white;
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding: 0 20px;
+        }
+        
+        .nav-btn {
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            background: var(--primary);
+            color: white;
+            border: none;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-btn:hover {
+            background: var(--secondary);
+        }
+        
+        .nav-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        .submit-btn {
+            background: var(--success);
+        }
+        
+        .submit-btn:hover {
+            background: #047857;
+        }
+    </style>
 </head>
 <body>
-  <h1>UPSC Quiz Generator is Loading...</h1>
-  <p>Your high-quality UPSC preparation platform is being deployed.</p>
-  <p>Check back in 5 minutes!</p>
+    <!-- Setup Screen -->
+    <header>
+        <div class="container">
+            <h1>UPSC Quiz Generator</h1>
+        </div>
+    </header>
+    
+    <div class="container" id="setupScreen">
+        <div class="content-card">
+            <h2>Create Your UPSC Prelims Quiz</h2>
+            
+            <div class="form-group">
+                <label for="userName">Your Name</label>
+                <input type="text" id="userName" placeholder="Enter your name">
+            </div>
+            
+            <div class="form-group">
+                <label>Select Subjects/Topics</label>
+                <div class="info-banner" id="currentAffairsWarning">
+                    <strong>Note:</strong> For Current Affairs tests, please select only the Current Affairs section. 
+                    Mixing with other subjects is not allowed as it will be 100% dynamic.
+                </div>
+                <div class="topics-container">
+                    <!-- Polity -->
+                    <div class="subject-category">
+                        <h3><i class="fas fa-landmark"></i> Polity & Governance</h3>
+                        <div class="topics-grid">
+                            <div class="topic-item">
+                                <input type="checkbox" id="polity-constitution" class="non-ca">
+                                <label for="polity-constitution">Constitutional Framework</label>
+                            </div>
+                            <div class="topic-item">
+                                <input type="checkbox" id="polity-government" class="non-ca">
+                                <label for="polity-government">System of Government</label>
+                            </div>
+                            <div class="topic-item">
+                                <input type="checkbox" id="polity-executive" class="non-ca">
+                                <label for="polity-executive">Executive & Legislature</label>
+                            </div>
+                            <div class="topic-item">
+                                <input type="checkbox" id="polity-judiciary" class="non-ca">
+                                <label for="polity-judiciary">Judiciary</label>
+                            </div>
+                            <div class="topic-item">
+                                <input type="checkbox" id="polity-rights" class="non-ca">
+                                <label for="polity-rights">Fundamental Rights</label>
+                            </div>
+                            <div class="topic-item">
+                                <input type="checkbox" id="polity-emergency" class="non-ca">
+                                <label for="polity-emergency">Emergency Provisions</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Economy -->
+                    <div class="subject-category">
+                        <h3><i class="fas fa-chart-line"></i> Economy</h3>
+                        <div class="topics-grid">
+                            <div class="topic-item">
+                                <input type="checkbox" id="economy-basic" class="non-ca">
+                                <label for="economy-basic">Basic Concepts</label>
+                            </div>
+                            <div class="topic-item">
+                                <input type="checkbox" id="economy-agriculture" class="non-ca">
+                                <label for="economy-agriculture">Agriculture & Food</label>
+                            </div>
+                            <div class="topic-item">
+                                <input type="checkbox" id="economy-industry" class="non-ca">
+                                <label for="economy-industry">Industry & Infrastructure</label>
+                            </div>
+                            <div class="topic-item">
+                                <input type="checkbox" id="economy-money" class="non-ca">
+                                <label for="economy-money">Money & Banking</label>
+                            </div>
+                            <div class="topic-item">
+                                <input type="checkbox" id="economy-fiscal" class="non-ca">
+                                <label for="economy-fiscal">Fiscal Policy</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- History -->
+                    <div class="subject-category">
+                        <h3><i class="fas fa-history"></i> History</h3>
+                        <div class="topics-grid">
+                            <div class="topic-item">
+                                <input type="checkbox" id="history-ancient" class="non-ca">
+                                <label for="history-ancient">Ancient India</label>
+                            </div>
+                            <div class="topic-item">
+                                <input type="checkbox" id="history-medieval" class="non-ca">
+                                <label for="history-medieval">Medieval India</label>
+                            </div>
+                            <div class="topic-item">
+                                <input type="checkbox" id="history-modern" class="non-ca">
+                                <label for="history-modern">Modern India (1757-1947)</label>
+                            </div>
+                            <div class="topic-item">
+                                <input type="checkbox" id="history-culture" class="non-ca">
+                                <label for="history-culture">Art & Culture</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Geography -->
+                    <div class="subject-category">
+                        <h3><i class="fas fa-globe-asia"></i> Geography</h3>
+                        <div class="topics-grid">
+                            <div class="topic-item">
+                                <input type="checkbox" id="geo-physical" class="non-ca">
+                                <label for="geo-physical">Physical Geography</label>
+                            </div>
+                            <div class="topic-item">
+                                <input type="checkbox" id="geo-human" class="non-ca">
+                                <label for="geo-human">Human Geography</label>
+                            </div>
+                            <div class="topic-item">
+                                <input type="checkbox" id="geo-india" class="non-ca">
+                                <label for="geo-india">Indian Geography</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Environment -->
+                    <div class="subject-category">
+                        <h3><i class="fas fa-leaf"></i> Environment & Ecology</h3>
+                        <div class="topics-grid">
+                            <div class="topic-item">
+                                <input type="checkbox" id="env-ecology" class="non-ca">
+                                <label for="env-ecology">Ecosystems</label>
+                            </div>
+                            <div class="topic-item">
+                                <input type="checkbox" id="env-biodiversity" class="non-ca">
+                                <label for="env-biodiversity">Biodiversity</label>
+                            </div>
+                            <div class="topic-item">
+                                <input type="checkbox" id="env-climate" class="non-ca">
+                                <label for="env-climate">Climate Change</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Science & Tech -->
+                    <div class="subject-category">
+                        <h3><i class="fas fa-flask"></i> Science & Technology</h3>
+                        <div class="topics-grid">
+                            <div class="topic-item">
+                                <input type="checkbox" id="sci-bio" class="non-ca">
+                                <label for="sci-bio">Biology & Biotech</label>
+                            </div>
+                            <div class="topic-item">
+                                <input type="checkbox" id="sci-it" class="non-ca">
+                                <label for="sci-it">IT & Communications</label>
+                            </div>
+                            <div class="topic-item">
+                                <input type="checkbox" id="sci-space" class="non-ca">
+                                <label for="sci-space">Space Technology</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Current Affairs -->
+                    <div class="subject-category">
+                        <h3><i class="fas fa-newspaper"></i> Current Affairs</h3>
+                        <div class="topics-grid">
+                            <div class="topic-item">
+                                <input type="checkbox" id="ca-national" class="ca-topic">
+                                <label for="ca-national">National Events</label>
+                            </div>
+                            <div class="topic-item">
+                                <input type="checkbox" id="ca-international" class="ca-topic">
+                                <label for="ca-international">International Relations</label>
+                            </div>
+                            <div class="topic-item">
+                                <input type="checkbox" id="ca-govt" class="ca-topic">
+                                <label for="ca-govt">Government Schemes</label>
+                            </div>
+                            <div class="topic-item">
+                                <input type="checkbox" id="ca-science" class="ca-topic">
+                                <label for="ca-science">Science & Tech News</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Full-Length Tests -->
+                    <div class="subject-category">
+                        <h3><i class="fas fa-file-alt"></i> Full-Length Tests</h3>
+                        <div class="topics-grid">
+                            <div class="topic-item">
+                                <input type="checkbox" id="full-prelims" class="non-ca">
+                                <label for="full-prelims">Prelims Full-Length Test</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Number of Questions</label>
+                <div class="question-options">
+                    <div class="question-option" onclick="selectQuestionCount(25)">25</div>
+                    <div class="question-option" onclick="selectQuestionCount(50)">50</div>
+                    <div class="question-option" onclick="selectQuestionCount(75)">75</div>
+                    <div class="question-option selected" onclick="selectQuestionCount(100)">100</div>
+                </div>
+            </div>
+            
+            <button class="btn" onclick="startQuiz()">
+                <i class="fas fa-play-circle"></i> Generate Quiz
+            </button>
+        </div>
+    </div>
+    
+    <!-- Quiz Screen (Hidden Initially) -->
+    <div class="container hidden" id="quizScreen">
+        <div class="quiz-screen">
+            <div class="quiz-header">
+                <div class="quiz-title">UPSC Prelims Mock Test</div>
+                <div class="timer" id="timer">120:00</div>
+            </div>
+            
+            <div class="quiz-content">
+                <div class="questions-section" id="questionsSection">
+                    <!-- Questions will be injected here -->
+                </div>
+                
+                <div class="question-tracker" id="questionTracker">
+                    <h3>Question Tracker</h3>
+                    <div class="question-dots" id="questionDots">
+                        <!-- Will be populated with JavaScript -->
+                    </div>
+                </div>
+            </div>
+            
+            <div class="navigation">
+                <button class="nav-btn" id="prevBtn" onclick="previousSet()" disabled>
+                    <i class="fas fa-arrow-left"></i> Previous
+                </button>
+                <button class="nav-btn" id="nextBtn" onclick="nextSet()">
+                    Next <i class="fas fa-arrow-right"></i>
+                </button>
+                <button class="nav-btn submit-btn hidden" id="submitBtn" onclick="submitTest()">
+                    Submit Test <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>© 2025 UPSC Quiz Generator | Designed for Serious UPSC Aspirants</p>
+            <p>Questions Automatically Generated Daily | Static:Dynamic Ratio 60:40</p>
+        </div>
+    </footer>
+
+    <script>
+        // State management
+        let selectedQuestionCount = 100;
+        let selectedTopics = [];
+        let currentSet = 0;
+        let totalSets = 0;
+        let timerInterval;
+        let timeRemaining = 0;
+        const questionsPerPage = 3;
+        
+        // DOM elements
+        const setupScreen = document.getElementById('setupScreen');
+        const quizScreen = document.getElementById('quizScreen');
+        const questionsSection = document.getElementById('questionsSection');
+        const questionDots = document.getElementById('questionDots');
+        const warningBanner = document.getElementById('currentAffairsWarning');
+        const timerEl = document.getElementById('timer');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        
+        // Sample questions
+        const sampleQuestions = [
+            {
+                id: 1,
+                text: "The 'Doctrine of Basic Structure' was propounded by the Supreme Court in which landmark case?",
+                options: [
+                    "A. Golak Nath vs State of Punjab (1967)",
+                    "B. Kesavananda Bharati vs State of Kerala (1973)",
+                    "C. Minerva Mills vs Union of India (1980)",
+                    "D. S.R. Bommai vs Union of India (1994)"
+                ],
+                correct: 1
+            },
+            {
+                id: 2,
+                text: "Which of the following is NOT a feature of the Indian federal system as described in the Constitution?",
+                options: [
+                    "A. Written Constitution",
+                    "B. Independent Judiciary",
+                    "C. Division of powers",
+                    "D. Dual citizenship"
+                ],
+                correct: 3
+            },
+            {
+                id: 3,
+                text: "The 'National Emergency' under Article 352 can be declared on which of the following grounds?",
+                options: [
+                    "A. War, external aggression or armed rebellion",
+                    "B. Failure of constitutional machinery in states",
+                    "C. Financial instability",
+                    "D. Natural calamities"
+                ],
+                correct: 0
+            }
+        ];
+        
+        // Select question count
+        function selectQuestionCount(count) {
+            selectedQuestionCount = count;
+            
+            // Remove selected class from all options
+            document.querySelectorAll('.question-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Add selected class to clicked option
+            event.target.classList.add('selected');
+        }
+        
+        // Start the quiz
+        function startQuiz() {
+            const userName = document.getElementById('userName').value;
+            if (!userName) {
+                alert('Please enter your name');
+                return;
+            }
+            
+            // Get selected topics
+            selectedTopics = [];
+            const selectedCheckboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+            selectedCheckboxes.forEach(checkbox => {
+                const label = document.querySelector(`label[for="${checkbox.id}"]`);
+                selectedTopics.push(label.textContent.trim());
+            });
+            
+            if (selectedTopics.length === 0) {
+                alert('Please select at least one topic');
+                return;
+            }
+            
+            // Check for current affairs conflict
+            const hasCATopics = document.querySelectorAll('.ca-topic:checked').length > 0;
+            const hasNonCATopics = document.querySelectorAll('.non-ca:checked').length > 0;
+            
+            if (hasCATopics && hasNonCATopics) {
+                warningBanner.classList.add('show');
+                return;
+            } else {
+                warningBanner.classList.remove('show');
+            }
+            
+            // Calculate time (1.2 minutes per question)
+            timeRemaining = selectedQuestionCount * 1.2 * 60; // in seconds
+            updateTimerDisplay();
+            
+            // Calculate total sets
+            totalSets = Math.ceil(selectedQuestionCount / questionsPerPage);
+            
+            // Show quiz screen
+            setupScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            
+            // Initialize question tracker
+            initQuestionTracker();
+            
+            // Render first question set
+            renderQuestionSet();
+            
+            // Start timer
+            startTimer();
+        }
+        
+        // Initialize question tracker
+        function initQuestionTracker() {
+            questionDots.innerHTML = '';
+            for (let i = 0; i < selectedQuestionCount; i++) {
+                const dot = document.createElement('div');
+                dot.className = 'question-dot';
+                dot.textContent = i + 1;
+                dot.addEventListener('click', () => goToQuestion(i));
+                questionDots.appendChild(dot);
+            }
+        }
+        
+        // Render current question set
+        function renderQuestionSet() {
+            questionsSection.innerHTML = '';
+            
+            // Calculate start index
+            const startIndex = currentSet * questionsPerPage;
+            
+            // Render 3 questions
+            for (let i = 0; i < questionsPerPage; i++) {
+                const questionIndex = startIndex + i;
+                if (questionIndex < selectedQuestionCount) {
+                    const question = sampleQuestions[questionIndex % sampleQuestions.length];
+                    const questionHTML = `
+                        <div class="question-card">
+                            <h3>${questionIndex + 1}. ${question.text}</h3>
+                            <ul class="options">
+                                ${question.options.map((opt, idx) => `
+                                    <li class="option" onclick="selectOption(this, ${questionIndex}, ${idx})">
+                                        ${opt}
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    `;
+                    questionsSection.innerHTML += questionHTML;
+                }
+            }
+            
+            // Update navigation buttons
+            prevBtn.disabled = currentSet === 0;
+            
+            if (currentSet === totalSets - 1) {
+                nextBtn.classList.add('hidden');
+                submitBtn.classList.remove('hidden');
+            } else {
+                nextBtn.classList.remove('hidden');
+                submitBtn.classList.add('hidden');
+            }
+            
+            // Update question tracker
+            updateQuestionTracker();
+        }
+        
+        // Update question tracker dots
+        function updateQuestionTracker() {
+            // Remove current class from all dots
+            Array.from(questionDots.children).forEach(dot => {
+                dot.classList.remove('current');
+            });
+            
+            // Calculate start index
+            const startIndex = currentSet * questionsPerPage;
+            
+            // Set current questions
+            for (let i = 0; i < questionsPerPage; i++) {
+                const questionIndex = startIndex + i;
+                if (questionIndex < selectedQuestionCount) {
+                    questionDots.children[questionIndex].classList.add('current');
+                }
+            }
+        }
+        
+        // Select an option
+        function selectOption(element, questionIndex, optionIndex) {
+            // Deselect all options in this question
+            const options = element.parentElement.querySelectorAll('.option');
+            options.forEach(opt => opt.classList.remove('selected'));
+            
+            // Select the clicked option
+            element.classList.add('selected');
+            
+            // Mark question as answered
+            questionDots.children[questionIndex].classList.add('answered');
+        }
+        
+        // Go to a specific question
+        function goToQuestion(index) {
+            currentSet = Math.floor(index / questionsPerPage);
+            renderQuestionSet();
+        }
+        
+        // Navigation functions
+        function previousSet() {
+            if (currentSet > 0) {
+                currentSet--;
+                renderQuestionSet();
+            }
+        }
+        
+        function nextSet() {
+            if (currentSet < totalSets - 1) {
+                currentSet++;
+                renderQuestionSet();
+            }
+        }
+        
+        function submitTest() {
+            clearInterval(timerInterval);
+            alert('Test submitted successfully! Detailed analysis would be shown in the final system.');
+            // In final version, this would show results screen
+        }
+        
+        // Timer functions
+        function startTimer() {
+            updateTimerDisplay();
+            
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                updateTimerDisplay();
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    submitTest();
+                }
+            }, 1000);
+        }
+        
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeRemaining / 60);
+            const seconds = timeRemaining % 60;
+            timerEl.textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+        }
+        
+        // Initialize the app
+        function init() {
+            // Add event listeners to checkboxes
+            const caCheckboxes = document.querySelectorAll('.ca-topic');
+            caCheckboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        warningBanner.classList.add('show');
+                    } else {
+                        // Check if any CA topics are still selected
+                        const anyCAChecked = Array.from(caCheckboxes).some(cb => cb.checked);
+                        if (!anyCAChecked) {
+                            warningBanner.classList.remove('show');
+                        }
+                    }
+                });
+            });
+        }
+        
+        // Start initialization when page loads
+        window.onload = init;
+    </script>
 </body>
 </html>
