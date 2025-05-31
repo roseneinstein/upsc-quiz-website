@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* Your existing CSS remains unchanged */
         :root {
             --primary: #1a56db;
             --secondary: #1e3a8a;
@@ -707,6 +708,9 @@
         let timeRemaining = 0;
         const questionsPerPage = 3;
         
+        // Stores all questions fetched from backend
+        let allQuestions = [];
+        
         // DOM elements
         const setupScreen = document.getElementById('setupScreen');
         const quizScreen = document.getElementById('quizScreen');
@@ -718,42 +722,51 @@
         const nextBtn = document.getElementById('nextBtn');
         const submitBtn = document.getElementById('submitBtn');
         
-        // Sample questions
-        const sampleQuestions = [
-            {
-                id: 1,
-                text: "The 'Doctrine of Basic Structure' was propounded by the Supreme Court in which landmark case?",
-                options: [
-                    "A. Golak Nath vs State of Punjab (1967)",
-                    "B. Kesavananda Bharati vs State of Kerala (1973)",
-                    "C. Minerva Mills vs Union of India (1980)",
-                    "D. S.R. Bommai vs Union of India (1994)"
-                ],
-                correct: 1
-            },
-            {
-                id: 2,
-                text: "Which of the following is NOT a feature of the Indian federal system as described in the Constitution?",
-                options: [
-                    "A. Written Constitution",
-                    "B. Independent Judiciary",
-                    "C. Division of powers",
-                    "D. Dual citizenship"
-                ],
-                correct: 3
-            },
-            {
-                id: 3,
-                text: "The 'National Emergency' under Article 352 can be declared on which of the following grounds?",
-                options: [
-                    "A. War, external aggression or armed rebellion",
-                    "B. Failure of constitutional machinery in states",
-                    "C. Financial instability",
-                    "D. Natural calamities"
-                ],
-                correct: 0
+        // Fetch questions from backend
+        async function fetchQuestions(count) {
+            try {
+                const response = await fetch(`http://localhost:5000/questions?questionCount=${count}`);
+                if (!response.ok) throw new Error('Failed to fetch questions');
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching questions:', error);
+                alert('Failed to load questions. Using sample questions instead');
+                
+                // Fallback sample questions
+                return [
+                    {
+                        question: "The 'Doctrine of Basic Structure' was propounded by the Supreme Court in which landmark case?",
+                        options: [
+                            "A. Golak Nath vs State of Punjab (1967)",
+                            "B. Kesavananda Bharati vs State of Kerala (1973)",
+                            "C. Minerva Mills vs Union of India (1980)",
+                            "D. S.R. Bommai vs Union of India (1994)"
+                        ],
+                        correctAnswer: 1
+                    },
+                    {
+                        question: "Which of the following is NOT a feature of the Indian federal system as described in the Constitution?",
+                        options: [
+                            "A. Written Constitution",
+                            "B. Independent Judiciary",
+                            "C. Division of powers",
+                            "D. Dual citizenship"
+                        ],
+                        correctAnswer: 3
+                    },
+                    {
+                        question: "The 'National Emergency' under Article 352 can be declared on which of the following grounds?",
+                        options: [
+                            "A. War, external aggression or armed rebellion",
+                            "B. Failure of constitutional machinery in states",
+                            "C. Financial instability",
+                            "D. Natural calamities"
+                        ],
+                        correctAnswer: 0
+                    }
+                ];
             }
-        ];
+        }
         
         // Select question count
         function selectQuestionCount(count) {
@@ -769,7 +782,7 @@
         }
         
         // Start the quiz
-        function startQuiz() {
+        async function startQuiz() {
             const userName = document.getElementById('userName').value;
             if (!userName) {
                 alert('Please enter your name');
@@ -798,6 +811,15 @@
                 return;
             } else {
                 warningBanner.classList.remove('show');
+            }
+            
+            // Fetch questions from backend
+            allQuestions = await fetchQuestions(selectedQuestionCount);
+            
+            // Adjust count if fewer questions available
+            if (allQuestions.length < selectedQuestionCount) {
+                selectedQuestionCount = allQuestions.length;
+                alert(`Only ${allQuestions.length} questions available. Test adjusted accordingly.`);
             }
             
             // Calculate time (1.2 minutes per question)
@@ -840,14 +862,14 @@
             // Calculate start index
             const startIndex = currentSet * questionsPerPage;
             
-            // Render 3 questions
+            // Render questions
             for (let i = 0; i < questionsPerPage; i++) {
                 const questionIndex = startIndex + i;
-                if (questionIndex < selectedQuestionCount) {
-                    const question = sampleQuestions[questionIndex % sampleQuestions.length];
+                if (questionIndex < selectedQuestionCount && allQuestions[questionIndex]) {
+                    const question = allQuestions[questionIndex];
                     const questionHTML = `
                         <div class="question-card">
-                            <h3>${questionIndex + 1}. ${question.text}</h3>
+                            <h3>${questionIndex + 1}. ${question.question}</h3>
                             <ul class="options">
                                 ${question.options.map((opt, idx) => `
                                     <li class="option" onclick="selectOption(this, ${questionIndex}, ${idx})">
